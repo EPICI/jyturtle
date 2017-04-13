@@ -212,6 +212,43 @@ public class Turtle extends PyObject {
 	}
 	
 	/**
+	 * Fill a rectangle with the specified width and height
+	 * centered on the turtle's current position,
+	 * regardless of whether the pen is down
+	 * 
+	 * @param args *args
+	 * @param keywords **kwargs
+	 */
+	public void fill(PyObject[] args,String[] keywords){
+		if(args.length!=2 || keywords.length!=0)throw new IllegalArgumentException("Incorrect argument count\nFirst argument should be width, second should be height");
+		int x = dimrx+(int)(xpos.asDouble()*scale),
+				y = dimry-(int)(ypos.asDouble()*scale),
+				w = (int)(args[0].asDouble()*scale),
+				h = (int)(args[1].asDouble()*scale);
+		if(w<=0 || h<=0)return;
+		preDraw(graphics);
+		graphics.fillRect(x-(w>>1), y-(h>>1), w, h);
+	}
+	
+	/**
+	 * Draw text centered on the turtle's current position,
+	 * with the default font
+	 * <br>
+	 * String should not contain multiple lines
+	 * 
+	 * @param string the text to draw
+	 */
+	public void text(PyObject pyString){
+		String string = pyString.__str__().asString();
+		FontMetrics metrics = graphics.getFontMetrics();
+		int x = dimrx+(int)(xpos.asDouble()*scale),
+				y = dimry-(int)(ypos.asDouble()*scale);
+		x += metrics.stringWidth(string)>>1;
+		y += (metrics.getHeight()>>1)+metrics.getAscent();
+		graphics.drawString(string,x,y);
+	}
+	
+	/**
 	 * Stamp to the main canvas
 	 * <br>
 	 * Ignores drawing restrictions
@@ -299,7 +336,7 @@ public class Turtle extends PyObject {
 		case "ctrl":
 		case "control":return KeyEvent.VK_CONTROL;
 		}
-		return s.charAt(0);
+		return s.charAt(0)-32;
 	}
 	
 	private static long time(){
